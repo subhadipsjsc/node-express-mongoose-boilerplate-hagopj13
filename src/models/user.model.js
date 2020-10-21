@@ -47,6 +47,14 @@ const userSchema = mongoose.Schema(
         },
         
     },
+    outlook: {
+        required: false,
+        id: {
+            type: String,
+            trim: true,
+        },
+        
+    },
     
     role: {
       type: String,

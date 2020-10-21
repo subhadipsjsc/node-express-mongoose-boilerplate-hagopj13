@@ -19,6 +19,17 @@ router.get('/googleRedirect', passport.authenticate('google'), authController.lo
 
 
 
+router.get('/microsoft',  passport.authenticate('windowslive', {
+    scope: [
+      'openid',
+      'profile',
+      'offline_access',
+      'https://outlook.office.com/Mail.Read'
+    ]
+  })
+)
+router.get('/microsoft-redirect', passport.authenticate('windowslive', { failureRedirect: '/' }),authController.login_with_outlook_redirect)
+
 module.exports = router;
 
 /**

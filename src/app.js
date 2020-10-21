@@ -11,7 +11,7 @@ const morgan = require('./config/morgan');
 /*================================================================
 --- 1. added passportgoogle_login module
 ==================================================================*/
-const { jwtStrategy, passportgoogle_login} = require('./config/passport');
+const { jwtStrategy, passportgoogle_login , passport_microsoft_login} = require('./config/passport');
 
 
 const { authLimiter } = require('./middlewares/rateLimiter');
@@ -58,6 +58,8 @@ passport.serializeUser(function(obj, done) { done(null, obj) })
 passport.deserializeUser(function(obj, done) { done(null, obj) })
 passport.use('jwt', jwtStrategy);
 passport.use(passportgoogle_login);
+passport.use(passport_microsoft_login);
+
 
 
 

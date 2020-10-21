@@ -67,7 +67,32 @@ const login_with_google_redirect = catchAsync(async (req, res) => {
     }
     
 });
-  
+
+
+const login_with_outlook_redirect = catchAsync(async (req, res) => {
+    let outlook_verified_user = {
+        name: req.user.displayName,
+        email:req.user.emails[0].value,
+        outlook:{
+            id :req.user.id,
+        }
+    }
+
+    existsUser = await userService.getUserByEmail(outlook_verified_user.email);
+    
+    if(existsUser == null){
+        console.log('new')
+        const user = await userService.createUser(outlook_verified_user);
+        const tokens = await tokenService.generateAuthTokens(user);
+        res.status(httpStatus.CREATED).send({ user, tokens });
+         
+    }
+    else{
+        console.log('old')
+        const tokens = await tokenService.generateAuthTokens(existsUser);
+        res.status(httpStatus.CREATED).send({ user:existsUser, tokens });
+    }
+});
   
 
 
@@ -79,5 +104,6 @@ module.exports = {
   refreshTokens,
   forgotPassword,
   resetPassword,
-  login_with_google_redirect
+  login_with_google_redirect,
+  login_with_outlook_redirect
 };
