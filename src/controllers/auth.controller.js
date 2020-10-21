@@ -1,6 +1,8 @@
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const { authService, userService, tokenService, emailService } = require('../services');
+const passport = require('passport')
+
 
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -36,6 +38,40 @@ const resetPassword = catchAsync(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
+
+
+const login_with_google_redirect = catchAsync(async (req, res) => {
+    let google_verified_user = {
+        name: req.user.displayName,
+        email:req.user.emails[0].value,
+        google:{
+            id :req.user.id,
+        }
+    }
+
+
+    existsUser = await userService.getUserByEmail(google_verified_user.email);
+
+
+    if(existsUser == null){
+       console.log('new')
+        const user = await userService.createUser(google_verified_user);
+        const tokens = await tokenService.generateAuthTokens(user);
+        res.status(httpStatus.CREATED).send({ user, tokens });
+        
+    }
+    else{
+        console.log('old')
+        const tokens = await tokenService.generateAuthTokens(existsUser);
+        res.status(httpStatus.CREATED).send({ user:existsUser, tokens });
+    }
+    
+});
+  
+  
+
+
+
 module.exports = {
   register,
   login,
@@ -43,4 +79,5 @@ module.exports = {
   refreshTokens,
   forgotPassword,
   resetPassword,
+  login_with_google_redirect
 };

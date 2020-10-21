@@ -15,6 +15,7 @@ const createUser = async (userBody) => {
   return user;
 };
 
+
 /**
  * Query for users
  * @param {Object} filter - Mongo filter
@@ -34,9 +35,10 @@ const queryUsers = async (filter, options) => {
  * @param {ObjectId} id
  * @returns {Promise<User>}
  */
-const getUserById = async (id) => {
+const getUserById= async (id) => {
   return User.findById(id);
 };
+
 
 /**
  * Get user by email

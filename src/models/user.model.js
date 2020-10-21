@@ -7,34 +7,47 @@ const { roles } = require('../config/roles');
 const userSchema = mongoose.Schema(
   {
     name: {
-      type: String,
-      required: true,
-      trim: true,
+        type: String,
+        required: true,
+        trim: true,
     },
     email: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-      lowercase: true,
-      validate(value) {
-        if (!validator.isEmail(value)) {
-          throw new Error('Invalid email');
-        }
-      },
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+        lowercase: true,
+        validate(value) {
+          if (!validator.isEmail(value)) {
+            throw new Error('Invalid email');
+          }
+        },
     },
-    password: {
-      type: String,
-      required: true,
-      trim: true,
-      minlength: 8,
-      validate(value) {
-        if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
-          throw new Error('Password must contain at least one letter and one number');
-        }
-      },
-      private: true, // used by the toJSON plugin
+
+    local: {
+        required: false,
+        password: {
+            type: String,
+            trim: true,
+            minlength: 8,
+            validate(value) {
+              if (!value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
+                throw new Error('Password must contain at least one letter and one number');
+              }
+            },
+            private: true, // used by the toJSON plugin
+        },
     },
+    
+    google: {
+        required: false,
+        id: {
+            type: String,
+            trim: true,
+        },
+        
+    },
+    
     role: {
       type: String,
       enum: roles,
@@ -71,13 +84,13 @@ userSchema.methods.isPasswordMatch = async function (password) {
   return bcrypt.compare(password, user.password);
 };
 
-userSchema.pre('save', async function (next) {
-  const user = this;
-  if (user.isModified('password')) {
-    user.password = await bcrypt.hash(user.password, 8);
-  }
-  next();
-});
+// userSchema.pre('save', async function (next) {
+//   const user = this;
+//   if (user.isModified('password')) {
+//     user.password = await bcrypt.hash(user.password, 8);
+//   }
+//   next();
+// });
 
 /**
  * @typedef User
