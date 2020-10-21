@@ -2,7 +2,7 @@ const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const { authService, userService, tokenService, emailService } = require('../services');
 const passport = require('passport')
-
+const base64UrlEncode = require('../helper/base64')
 
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -57,14 +57,21 @@ const login_with_google_redirect = catchAsync(async (req, res) => {
        console.log('new')
         const user = await userService.createUser(google_verified_user);
         const tokens = await tokenService.generateAuthTokens(user);
-        res.status(httpStatus.CREATED).send({ user, tokens });
+        //res.status(httpStatus.CREATED).send({ user, tokens });
+
+        base64_data  = Buffer.from(JSON.stringify({loginby:'google', user, tokens })).toString('base64')
+        base64_data  = base64UrlEncode(base64_data)
         
     }
     else{
         console.log('old')
         const tokens = await tokenService.generateAuthTokens(existsUser);
-        res.status(httpStatus.CREATED).send({ user:existsUser, tokens });
+        //res.status(httpStatus.CREATED).send({ user:existsUser, tokens });
+        base64_data  = Buffer.from(JSON.stringify({ loginby:'google', user:existsUser, tokens })).toString('base64')
+        base64_data  = base64UrlEncode(base64_data)
     }
+
+    res.redirect('http://localhost:8080/login?data='+base64_data); 
     
 });
 
@@ -84,14 +91,19 @@ const login_with_outlook_redirect = catchAsync(async (req, res) => {
         console.log('new')
         const user = await userService.createUser(outlook_verified_user);
         const tokens = await tokenService.generateAuthTokens(user);
-        res.status(httpStatus.CREATED).send({ user, tokens });
-         
+        //res.status(httpStatus.CREATED).send({ loginby:'outlook',user, tokens });
+        base64_data  = Buffer.from(JSON.stringify({loginby:'outlook', user, tokens })).toString('base64')
+        base64_data  = base64UrlEncode(base64_data)
     }
     else{
         console.log('old')
         const tokens = await tokenService.generateAuthTokens(existsUser);
-        res.status(httpStatus.CREATED).send({ user:existsUser, tokens });
+        //res.status(httpStatus.CREATED).send({ loginby:'outlook',user:existsUser, tokens });
+        base64_data  = Buffer.from(JSON.stringify({ loginby:'outlook', user:existsUser, tokens })).toString('base64')
+        base64_data  = base64UrlEncode(base64_data)
     }
+
+    res.redirect('http://localhost:8080/login?data='+base64_data);
 });
   
 
